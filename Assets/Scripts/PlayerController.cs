@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     public float speed = 80.0f;
     private Rigidbody2D rb = null;
-    [SerializeField] GameObject ballPrefab,canvas,twicaZone2,twicaZone3,countor,valsePrefab;
+    [SerializeField] GameObject ballPrefab,canvas,twicaZone2,twicaZone3,countor;
     [SerializeField] Transform shotPoint;
     public int ballCount,finishCount = 0;
 
@@ -66,22 +66,9 @@ public class PlayerController : MonoBehaviour
             Debug.Log("TwiceZone3");
         }
 
-        if (ballCount > 100)
+        if (ballCount > 200)
         {
-            GameObject go2 = Instantiate(valsePrefab,new Vector3(126,40,0),Quaternion.identity);
-            go2.transform.SetParent(canvas.transform, false);
-            Debug.Log("Valse");
-            Invoke("Valse",2);
+            SceneManager.LoadScene("Scene2");
         }
-
-        if (ballCount > 500)
-        {
-            //SceneManager.LoadScene("Scene2");
-        }
-    }
-
-    void Valse()
-    {
-        SceneManager.LoadScene("Scene2");
     }
 }
