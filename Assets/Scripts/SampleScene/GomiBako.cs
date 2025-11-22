@@ -12,13 +12,13 @@ public class GomiBako : MonoBehaviour
     void Start()
     {
         countText = GetComponent<TextMeshProUGUI>();
-        countText.text = count.ToString("F0") + "ŒÂ";
+        countText.text = count.ToString("F0") + "‘Ì";
     }
 
     void OnTriggerEnter2D(Collider2D collision)
     {
         count--;
-        countText.text = count.ToString("F0") + "ŒÂ";
+        countText.text = count.ToString("F0") + "‘Ì";
     }
 
     void Update()
