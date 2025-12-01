@@ -30,16 +30,26 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) && finishCount < 10)
         {
-            Vector3 pos = shotPoint.position;
-            pos.x = pos.x*4.7f;
-            pos.y = 170;
-            pos.z = 0;
-            GameObject go = Instantiate(ballPrefab, pos, shotPoint.rotation);
-            go.transform.SetParent(canvas.transform, false);
+            // Convert the world position of the shotPoint to the canvas local position
+            // so we can place the UI ball without using a magic multiplier.
+            Vector3 worldPos = shotPoint.position;
+            RectTransform canvasRect = canvas.GetComponent<RectTransform>();
 
-            BallController ballController;
-            ballController = ballPrefab.GetComponent<BallController>();
-            ballController.ballSE = true;
+            Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(Camera.main, worldPos);
+            Vector2 localPoint;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPoint, Camera.main, out localPoint);
+
+            GameObject go = Instantiate(ballPrefab, canvas.transform);
+            RectTransform goRect = go.GetComponent<RectTransform>();
+            if (goRect != null)
+                goRect.anchoredPosition = localPoint;
+            else
+                go.transform.localPosition = new Vector3(localPoint.x, localPoint.y, 0);
+
+            BallController ballController = go.GetComponent<BallController>();
+            if (ballController != null)
+                ballController.ballSE = true;
+
             finishCount++;
         }
 
