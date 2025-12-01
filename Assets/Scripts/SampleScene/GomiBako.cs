@@ -45,6 +45,9 @@ public class GomiBako : MonoBehaviour
             {
                 count--;
                 countText.text = count.ToString("F0") + "体";
+
+                // 当たってきたオブジェクトを削除
+                Destroy(collision.gameObject);
             }
         }
     }
@@ -57,6 +60,9 @@ public class GomiBako : MonoBehaviour
         {
             count--;
             countText.text = count.ToString("F0") + "体";
+
+            // 当たってきたオブジェクトを削除
+            Destroy(incoming.gameObject);
         }
     }
 
