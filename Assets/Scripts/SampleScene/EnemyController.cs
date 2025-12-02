@@ -8,41 +8,64 @@ public class EnemyController : MonoBehaviour
     private float directionChangeTimer = 0f;
     private float directionChangeInterval = 1.0f;
 
-    private Collider2D targetCollider; // ©“®æ“¾
-    private EnemyGenerator generator; // EnemyGeneratorQÆ
+    private Collider2D targetCollider; // ï¿½ï¿½ï¿½ï¿½ï¿½æ“¾
+    private EnemyGenerator generator; // EnemyGeneratorï¿½Qï¿½ï¿½
+    private Rigidbody2D rb; // ï¿½ï¿½ï¿½ï¿½ï¿½Ú“ï¿½ï¿½p
 
     void Start()
     {
-        // EnemyGenerator‚ğeCanvas‚©‚çæ“¾
+        // EnemyGeneratorï¿½ï¿½eCanvasï¿½ï¿½ï¿½ï¿½æ“¾
         generator = GetComponentInParent<EnemyGenerator>();
-        // DeleteZone‚ÌCollider2D‚ğ©“®æ“¾
+        // DeleteZoneï¿½ï¿½Collider2Dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ“¾
         GameObject deleteZoneObj = GameObject.Find("DeleteZone");
         if (deleteZoneObj != null)
         {
             targetCollider = deleteZoneObj.GetComponent<Collider2D>();
         }
+
+        // Rigidbody2Dï¿½ï¿½ï¿½æ“¾ï¿½iï¿½È‚ï¿½ï¿½ï¿½Î“ï¿½ï¿½Iï¿½É’Ç‰ï¿½ï¿½jï¿½Bï¿½ï¿½ï¿½ï¿½ï¿½xï¿½[ï¿½Xï¿½ÌˆÚ“ï¿½ï¿½ÉØ‚ï¿½Ö‚ï¿½ï¿½ï¿½B
+        rb = GetComponent<Rigidbody2D>();
+        if (rb == null)
+        {
+            rb = gameObject.AddComponent<Rigidbody2D>();
+        }
+        rb.gravityScale = 0f; // ï¿½dï¿½Í–ï¿½ï¿½ï¿½
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous; // ï¿½ï¿½ï¿½ï¿½ï¿½Ú“ï¿½ï¿½Å‚ï¿½ï¿½Ñ’Ê‚ï¿½}ï¿½ï¿½
+        rb.freezeRotation = true;
     }
 
     void Update()
     {
-        // 1•b‚²‚Æ‚É¶‰E•ûŒü‚ğƒ‰ƒ“ƒ_ƒ€•ÏX
+        // 1ï¿½bï¿½ï¿½ï¿½Æ‚Éï¿½ï¿½Eï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ÏX
         directionChangeTimer += Time.deltaTime;
         if (directionChangeTimer >= directionChangeInterval)
         {
             horizontalDirection = Random.Range(-1, 2); // -1, 0, 1
             directionChangeTimer = 0f;
         }
+    }
 
-        // ã•ûŒü{¶‰E•ûŒü‚ÉˆÚ“®
-        Vector2 move = new Vector2(horizontalDirection * horizontalSpeed, moveSpeed);
-        transform.Translate(move * Time.deltaTime);
+    void FixedUpdate()
+    {
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÅˆÚ“ï¿½ï¿½iTranslateï¿½Å‚Í•ï¿½ï¿½ï¿½ï¿½Õ“Ë‚ï¿½ï¿½ï¿½ï¿½è”²ï¿½ï¿½ï¿½é‚±ï¿½Æ‚ï¿½ï¿½ï¿½ï¿½ï¿½j
+        if (rb != null)
+        {
+            Vector2 velocity = new Vector2(horizontalDirection * horizontalSpeed, moveSpeed);
+            rb.linearVelocity = velocity;
+        }
+        else
+        {
+            // ï¿½ß‚ï¿½ï¿½Ìˆï¿½ï¿½Sï¿½ï¿½iï¿½Oï¿½Ì‚ï¿½ï¿½ßj
+            Vector2 move = new Vector2(horizontalDirection * horizontalSpeed, moveSpeed);
+            transform.Translate(move * Time.fixedDeltaTime);
+        }
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
         if (targetCollider != null && other == targetCollider)
         {
-            // EnemyGenerator‚ÌƒJƒEƒ“ƒg‚ğŒ¸‚ç‚·
+            // EnemyGeneratorï¿½ÌƒJï¿½Eï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ç‚·
             if (generator != null)
             {
                 generator.SetMaxEnemyCount(generator.maxEnemyCount - 1);
