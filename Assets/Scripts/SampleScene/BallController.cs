@@ -28,21 +28,72 @@ public class BallController : MonoBehaviour
     void OnTriggerEnter2D(Collider2D collision)
     {
         Debug.Log(collision.gameObject.name);
-        if (collision.gameObject.name == "Image6")
+        if (collision.gameObject.name == "Twice")
         {
-            Vector3 pos = thisTransform.position;
-            pos.x = pos.x * 4.7f;
-            pos.y = pos.y * 4.4f;
-            pos.z = 0;
-            GameObject go = Instantiate(ball, pos, thisTransform.rotation);
-            GameObject canvas = GameObject.Find("Canvas");
-            go.transform.SetParent(canvas.transform, false);
-            audioSource.PlayOneShot(sound1);
+            // If the ball prefab has a Rigidbody2D, instantiate it in world space so physics can push enemies.
+            if (ball != null && ball.GetComponent<Rigidbody2D>() != null)
+            {
+                Vector3 spawnPos = thisTransform != null ? thisTransform.position : transform.position;
+                GameObject go = Instantiate(ball, spawnPos, thisTransform != null ? thisTransform.rotation : transform.rotation);
 
-            PlayerController playerController;
-            GameObject imageBallRed = GameObject.Find("ImageBallRed");
-            playerController = imageBallRed.GetComponent<PlayerController>();
-            playerController.ballCount++;
+                audioSource.PlayOneShot(sound1);
+
+                PlayerController playerController;
+                GameObject playerObject = GameObject.Find("Player");
+                if (playerObject != null)
+                {
+                    playerController = playerObject.GetComponent<PlayerController>();
+                    if (playerController != null)
+                        playerController.ballCount++;
+                }
+            }
+            else
+            {
+                // Fallback for UI-style ball: place under Canvas using previous conversion logic
+                GameObject canvasGO = GameObject.Find("Canvas");
+                if (canvasGO == null)
+                {
+                    Debug.LogWarning("Canvas not found");
+                    return;
+                }
+
+                Canvas canvas = canvasGO.GetComponent<Canvas>();
+                RectTransform canvasRect = canvasGO.GetComponent<RectTransform>();
+
+                Camera cam = null;
+                if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+                {
+                    cam = Camera.main;
+                }
+
+                Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(cam, thisTransform.position);
+                Vector2 localPoint;
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPoint, cam, out localPoint);
+
+                GameObject go = Instantiate(ball);
+                go.transform.SetParent(canvasGO.transform, false);
+
+                RectTransform goRect = go.GetComponent<RectTransform>();
+                if (goRect != null)
+                {
+                    goRect.anchoredPosition = localPoint;
+                }
+                else
+                {
+                    go.transform.localPosition = new Vector3(localPoint.x, localPoint.y, 0f);
+                }
+
+                audioSource.PlayOneShot(sound1);
+
+                PlayerController playerController;
+                GameObject playerObject = GameObject.Find("Player");
+                if (playerObject != null)
+                {
+                    playerController = playerObject.GetComponent<PlayerController>();
+                    if (playerController != null)
+                        playerController.ballCount++;
+                }
+            }
         }
     }
 }

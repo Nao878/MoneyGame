@@ -49,6 +49,11 @@ public class GomiBako : MonoBehaviour
                 // 当たってきたオブジェクトを削除
                 Destroy(collision.gameObject);
             }
+            else
+            {
+                // タグが指定されていて一致しない場合は、カウントは減らさずオブジェクトのみ削除する
+                Destroy(collision.gameObject);
+            }
         }
     }
 
@@ -62,6 +67,11 @@ public class GomiBako : MonoBehaviour
             countText.text = count.ToString("F0") + "体";
 
             // 当たってきたオブジェクトを削除
+            Destroy(incoming.gameObject);
+        }
+        else
+        {
+            // タグが指定されていて一致しない場合は、カウントは減らさずオブジェクトのみ削除する
             Destroy(incoming.gameObject);
         }
     }
